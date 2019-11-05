@@ -1,0 +1,46 @@
+version: '3.7'
+
+volumes:
+  strapi_volume:
+  metabase_volume:
+
+services:
+  postgres_strapi:
+    image: postgres:9.6
+    ports:
+      - 27017:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: strapi
+    volumes:
+      - type: volume
+        source: strapi_volume
+        target: /var/lib/postgresql/data
+
+
+  postgres_metabase:
+    image: postgres:9.6
+    ports:
+      - 27018:5432
+    volumes:
+      - type: volume
+        source: metabase_volume
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: metabase
+
+  metabase:
+    image: metabase/metabase:v0.33.4
+    ports:
+      - 27019:3000
+    environment:
+      MB_DB_TYPE: postgres 
+      MB_DB_PORT: 5432
+      MB_DB_AUTOMIGRATE: "true"
+      MB_DB_HOST: postgres_metabase
+      MB_DB_USER: postgres
+      MB_DB_PASS: postgres
+      MB_DB_NAME: metabase
